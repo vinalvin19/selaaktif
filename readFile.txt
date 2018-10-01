@@ -1,0 +1,3 @@
+koii
+nama: 512
+umur: 13
