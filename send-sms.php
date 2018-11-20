@@ -17,6 +17,8 @@
   <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
   <!-- Page level plugin CSS-->
   <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+  
+  <link href="vendor/bootstrap/css/awesome-bootstrap-checkbox.css" rel="stylesheet">
   <!-- Custom styles for this template-->
   <link href="css/sb-admin.css" rel="stylesheet">
 </head>
@@ -53,6 +55,12 @@
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
+          </a>
+        </li> 
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+          <a class="nav-link" href="jammer-conf.php">
+            <i class="fa fa-fw fa-signal"></i>
+            <span class="nav-link-text">Jammer Configuration</span>
           </a>
         </li> 
         <!-- <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
@@ -222,23 +230,58 @@
       <!-- Area Chart Example-->
       <div class="card mb-3">
         <div class="card-header">
-          <i class="fa fa-send"></i> SMS Send</div>
-        <div class="card-body">
-          <input type="text" name="numberToSend" placeholder="Sender Number" class="form-control" style="width: 20%">
-          <br>
-          <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-            <div class="form-group row">
-              <div class="col-sm-10">
-                <textarea name="textToSend" placeholder="Hi! Welcome to Indonesia" rows="7" cols="100" class="form-control"></textarea>
+          <i class="fa fa-send"></i> SMS Broadcast</div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-7">
+                <input type="text" name="numberToSend" placeholder="Sender Number" class="form-control" style="width: 40%">
+                <br>
+                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+                  <div class="form-group row">
+                    <div class="col-sm-10">
+                      <textarea name="textToSend" placeholder="Hi! Welcome to Indonesia" rows="7" cols="100" class="form-control"></textarea>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-10">
+                      <input class="btn btn-primary btn-block" type="submit" name="smsForm" value="SEND" style="width: 20%">                
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-4" style="border-left: 1px solid grey">
+                <fieldset>
+                    <legend style="font-size: 14pt">
+                        Recipient
+                    </legend>
+                    <p></p>
+                    <?php 
+                      echo ('<div class="checkbox checkbox-info checkbox-circle">');
+                          echo ('<input id="bc-broadcast" class="styled" type="checkbox" checked>');
+                          echo ('<label for="bc-broadcast">');
+                              echo ('All');
+                          echo ('</label>');
+                      echo ('</div>');
+                      $msisdn = array();
+                      $dump =  explode("\n", $ues);
+                      foreach (array_filter($dump) as $item) {
+                        array_push($msisdn, explode(",",$item)[2]);
+                      }
+                      $i = 0;
+                      foreach ($msisdn as $msisdn_ind) {
+                        $i++;
+                        echo ('<div id="dynamic-cb" class="checkbox checkbox-circle">');
+                        echo ('<input id="cb'.$i.'" class="styled" type="checkbox">');
+                        echo ('<label for="cb'.$i.'">');
+                        echo ($msisdn_ind);
+                        echo ('</label>');
+                        echo ('</div>');
+                      }
+                    ?>
+                </fieldset>
+              </div>
               </div>
             </div>
-            <div class="form-group row">
-              <div class="col-sm-10">
-                <input class="btn btn-primary btn-block" type="submit" name="smsForm" value="SEND" style="width: 20%">                
-              </div>
-            </div>
-          </form>
-        </div>
       </div>
       
       <div class="card mb-3">
@@ -297,4 +340,16 @@
   </div>
 </body>
 
+<script src="vendor/jquery/jquery.min.js"></script>
+<script>
+
+  $("input[id^='cb']").click(function() {
+    $('#bc-broadcast').prop('checked', false);
+  });
+
+  $("input[id^='bc']").click(function() {
+    $("input[id^='cb']").prop('checked', false);
+  });
+
+</script>
 </html>

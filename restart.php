@@ -54,6 +54,12 @@
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+          <a class="nav-link" href="jammer-conf.php">
+            <i class="fa fa-fw fa-signal"></i>
+            <span class="nav-link-text">Jammer Configuration</span>
+          </a>
+        </li> 
         <!-- <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
           <a class="nav-link" href="tables.html">
             <i class="fa fa-fw fa-table"></i>
