@@ -1,5 +1,7 @@
 <?php  
   session_start();
+  $page = $_SERVER['PHP_SELF'];
+  $sec = "5";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="root" >
+  <meta http-equiv="refresh" content="<?php echo $sec?>; URL='<?php echo $page?>'">
   <title>SelaAktif Configuration</title>
   <!-- Bootstrap core CSS-->
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -21,7 +24,7 @@
   <link href="css/sb-admin.css" rel="stylesheet">
 </head>
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.php">SelaAktif</a>
@@ -30,31 +33,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -90,8 +93,8 @@
       ini_set('display_errors', 'On');
       error_reporting(E_ALL);
 
-      //$filename = "/usr/local/etc/yate/tmsidata.conf";
-      $filename = "tmsidata.conf";
+      $filename = "/usr/local/etc/yate/tmsidata.conf";
+      //$filename = "tmsidata.conf";
       $fd = fopen($filename,"r");
       $textFileContents = fread($fd,filesize($filename));
       $ues = substr($textFileContents, strpos($textFileContents, "[ues]")+5);
@@ -109,8 +112,9 @@
           array_push($msisdn, explode(",",$item)[2]);
           array_push($tmsi, explode(",",$item)[3]);
       }
-      
       ?>
+      Total nomor tersambung: <b><?php echo count($tmsi); ?></b>
+      <br><br>
       <div class="form-row">
         <div class="card mb-3 col-md-3" style="text-align: center;">
           <div class="card-header">IMSI</div>
@@ -158,7 +162,17 @@
           </div>
         </div>
       </div>
-      
+    <br>  
+	<a class="btn btn-primary btn-block" style="width: 10%" href="mobile-list.php?clearData=true" name="clearData" id="toggleNavPosition">Clear Data</a>
+	<br>
+	<?php
+      if (isset($_GET["clearData"])) {
+         $var = shell_exec('sudo cp /var/www/html/ui/tmsidata.conf /usr/local/etc/yate/tmsidata.conf');
+         //header("Location: mobile-list.php");
+         echo "<script> location.replace('mobile-list.php'); </script>";
+         //echo "<pre>$var</pre>";
+      }
+    ?>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
     <footer class="sticky-footer">

@@ -1,4 +1,4 @@
-<?php  
+	<?php  
   session_start();
 ?>
 <!DOCTYPE html>
@@ -21,7 +21,7 @@
   <link href="css/sb-admin.css" rel="stylesheet">
 </head>
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.php">SelaAktif</a>
@@ -30,31 +30,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -89,29 +89,20 @@
       <hr>
       <p>The last unsaved configuration will not be saved. Restart the device?</p>
       <a class="btn btn-primary btn-block" style="width: 20%" href="restart.php?restartYate=true" name="restartYate" id="toggleNavPosition">Yes</a>
-      <!--<a class="btn btn-primary btn-block" style="width: 20%" href="restart.php?restartRaspi=true" name="restartYate" id="toggleNavPosition">Telnet</a>-->
+	  <br>
+	  <hr>
+	  <br>
+	  <p>The last unsaved configuration will not be saved. Reset the configuration?</p>
+      <a class="btn btn-primary btn-block" style="width: 20%" href="restart.php?resetData=true" name="resetData" id="toggleNavPosition">Reset Configuration</a>
       <br>
       <?php
       if (isset($_GET["restartYate"])) {
-         $var = shell_exec('whoami');
+         $var = shell_exec('sudo yate');
          echo "<pre>$var</pre>";
       }
-      if (isset($_GET["restartRaspi"])) {
-         //$var = shell_exec('telnet localhost 5038');
-         //echo "<pre>$var</pre>";
-         $connectTelnet = fsockopen("localhost", 5038, $errno, $errstr, 30);
-         if(!$connectTelnet){
-			 echo "salaahh";
-		 } else {
-			 $out = fgets($connectTelnet, 1024);
-			 usleep(1000000);
-			 fputs($connectTelnet, "smssend 6253425110 00 hai\r\n");
-			 $out = fgets($connectTelnet, 1024);
-			 if ($out != "message succesfuly sent."){
-				 echo ("aaa");
-			 }
-		 }
-		 fclose($connectTelnet);
+      if (isset($_GET["resetData"])) {
+         $var = shell_exec('sudo cp /var/www/html/ui/ybts.conf /usr/local/etc/yate/ybts.conf');
+         echo "<script> location.replace('restart.php'); </script>";
       }
       ?>
     </div>

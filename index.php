@@ -22,7 +22,7 @@
 </head>
 
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.html">SelaAktif</a>
@@ -31,31 +31,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -176,23 +176,31 @@
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
 
-    //$filename = "/usr/local/etc/yate/ybts.conf";
-    $filename = "ybts.conf";
+    $filename = "/usr/local/etc/yate/ybts.conf";
+    //$filename = "ybts.conf";
     $fd = fopen($filename,"r");
     $textFileContents = fread($fd,filesize($filename));
     fclose($fd);
     $valueMCI = substr($textFileContents, strpos($textFileContents, "Identity.MNC=")+13, 2);
     $valueRadioBand = substr($textFileContents, strpos($textFileContents, "Radio.Band=")+11, 3);
-    $valueRadioC0 = substr($textFileContents, strpos($textFileContents, "Radio.C0=")+9, 2);
+    $valueRadioC0 = substr($textFileContents, strpos($textFileContents, "Radio.C0=")+9, 3);
+    $valueRadioC0 = preg_replace('/\s+/','',$valueRadioC0);
+    echo "<script>console.log('".strlen($valueRadioC0)."');</script>";
 
     if($valueMCI==10)
       $_SESSION["operator"] = "Telkomsel";
     else if($valueMCI == 11)
-      $_SESSION["operator"] = "XL/AXIS";
+      $_SESSION["operator"] = "XL";
+    else if($valueMCI == 89)
+      $_SESSION["operator"] = "Hutchinson 3";
+    else if($valueMCI == '08')
+      $_SESSION["operator"] = "AXIS";
     else
       $_SESSION["operator"] = "Indosat";
     
     if (isset($_POST['frmSub'])) {
+	  //$var = shell_exec('sudo pkill yate');
+	  //usleep(1000000);
       $tempResult= $textFileContents;
       $resultToReplace = "Identity.MNC=".$valueMCI;
       $resultForReplace = "Identity.MNC=".$_POST['inputMNC'];
@@ -210,11 +218,26 @@
       
       $finalResult = str_replace($before,$after,$tempResult);
       
-      //$fd=fopen("/usr/local/etc/yate/ybts.conf","w");
-      $fd=fopen("ybts.conf","w");
+      $fd=fopen("/usr/local/etc/yate/ybts.conf","w");
+      //$fd=fopen("ybts.conf","w");
       fwrite($fd, $finalResult);
       echo "<meta http-equiv='refresh' content='0'>";
       fclose($fd);
+      
+      //usleep(500000);
+      //`echo "sudo yate" | at now`;
+      //exec("sudo yate &");
+      $connectTelnet = fsockopen("localhost", 5038, $errno, $errstr, 30);
+  	  if(!$connectTelnet){
+		echo "salaahh";
+   	  } else {
+		$out = fgets($connectTelnet, 1024);				
+		$sendTemplate = "reload";
+		usleep(500000);
+		fputs($connectTelnet, $sendTemplate."\r\n");
+		$out = fgets($connectTelnet, 1024);
+	  }
+	  fclose($connectTelnet);
       session_destroy();
     }
   ?>
@@ -240,8 +263,10 @@
                 <!-- <input type="text" name="inputMNC" value="<?php echo ($valueMCI);?>" maxlength="2" id="inputMNCId" class="form-control" style="width: 30%"> -->
                 <select name="inputMNC" id="inputMNCId" class="form-control" style="width: 30%">
                   <option value="10" <?php if ($valueMCI == 10 ) echo 'selected="selected"'; ?>>Telkomsel</option>
-                  <option value="11" <?php if ($valueMCI == 11 ) echo 'selected="selected"'; ?>>XL/AXIS</option>
-                  <option value="12" <?php if ($valueMCI == 12 ) echo 'selected="selected"'; ?>>Indosat</option>
+                  <option value="11" <?php if ($valueMCI == 11 ) echo 'selected="selected"'; ?>>XL</option>
+                  <option value="08" <?php if ($valueMCI == '08' ) echo 'selected="selected"'; ?>>AXIS</option>
+                  <option value="01" <?php if ($valueMCI == '01' ) echo 'selected="selected"'; ?>>Indosat</option>
+                  <option value="89" <?php if ($valueMCI == 89 ) echo 'selected="selected"'; ?>>Hutchinson 3</option>
                 </select>
               </div>
             </div>
@@ -1287,7 +1312,7 @@
   $("#inputMNCId").on('change', function() {
     if ($(this).val() == 10){
         $("#radioC0Id").val("900-60");
-    } else if ($(this).val() == 11){
+    } else if ($(this).val() == 11 || $(this).val() == '08'){
         $("#radioC0Id").val("900-100");
     } else {
         $("#radioC0Id").val("900-25");
