@@ -530,8 +530,8 @@
                         </select>
                       </div>
                     </div>
-				  </div>
-			  </div>
+    				  </div>
+    			  </div>
                 <!-- <input type="text" name="inputMNC" value="<?php echo ($valueMCI);?>" maxlength="2" id="inputMNCId" class="form-control" style="width: 30%"> -->
                 <select name="inputMNC" id="inputMNCId" class="form-control" style="width: 30%">
                   <option value="10" <?php if ($valueMCI == 10 ) echo 'selected="selected"'; ?>>Telkomsel</option>
