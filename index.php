@@ -22,7 +22,7 @@
 </head>
 
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.html">SelaAktif</a>
@@ -31,31 +31,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -183,16 +183,24 @@
     fclose($fd);
     $valueMCI = substr($textFileContents, strpos($textFileContents, "Identity.MNC=")+13, 2);
     $valueRadioBand = substr($textFileContents, strpos($textFileContents, "Radio.Band=")+11, 3);
-    $valueRadioC0 = substr($textFileContents, strpos($textFileContents, "Radio.C0=")+9, 2);
+    $valueRadioC0 = substr($textFileContents, strpos($textFileContents, "Radio.C0=")+9, 3);
+    $valueRadioC0 = preg_replace('/\s+/','',$valueRadioC0);
+    echo "<script>console.log('".strlen($valueRadioC0)."');</script>";
 
     if($valueMCI==10)
       $_SESSION["operator"] = "Telkomsel";
     else if($valueMCI == 11)
-      $_SESSION["operator"] = "XL/AXIS";
+      $_SESSION["operator"] = "XL";
+    else if($valueMCI == 89)
+      $_SESSION["operator"] = "Hutchinson 3";
+    else if($valueMCI == '08')
+      $_SESSION["operator"] = "AXIS";
     else
       $_SESSION["operator"] = "Indosat";
     
     if (isset($_POST['frmSub'])) {
+	  //$var = shell_exec('sudo pkill yate');
+	  //usleep(1000000);
       $tempResult= $textFileContents;
       $resultToReplace = "Identity.MNC=".$valueMCI;
       $resultForReplace = "Identity.MNC=".$_POST['inputMNC'];
@@ -210,11 +218,26 @@
       
       $finalResult = str_replace($before,$after,$tempResult);
       
-      //$fd=fopen("/usr/local/etc/yate/ybts.conf","w");
-      $fd=fopen("ybts.conf","w");
+      $fd=fopen("/usr/local/etc/yate/ybts.conf","w");
+      //$fd=fopen("ybts.conf","w");
       fwrite($fd, $finalResult);
       echo "<meta http-equiv='refresh' content='0'>";
       fclose($fd);
+      
+      //usleep(500000);
+      //`echo "sudo yate" | at now`;
+      //exec("sudo yate &");
+      $connectTelnet = fsockopen("localhost", 5038, $errno, $errstr, 30);
+  	  if(!$connectTelnet){
+  		    echo "salaahh";
+     	} else {
+    		$out = fgets($connectTelnet, 1024);				
+    		$sendTemplate = "reload";
+    		usleep(500000);
+    		fputs($connectTelnet, $sendTemplate."\r\n");
+    		$out = fgets($connectTelnet, 1024);
+  	  }
+	     fclose($connectTelnet);
       session_destroy();
     }
   ?>
@@ -237,11 +260,285 @@
             <div class="form-group row">
               <label for="inputMNCId" class="col-sm-2 col-form-label">Identity MNC</label>
               <div class="col-sm-10">
+      				  <div class="checkbox checkbox-info checkbox-circle">
+                  <div class="col-md-10" style="display: inline-flex;">
+        					  <div class="col-md-4">
+        						  <input id="bc-broadcast" class="styled" type="checkbox">
+          						  <label for="bc-broadcast">
+          							  Telkomsel
+          						  </label>
+        					  </div>
+        					  <div class="col-md-6">
+        						  <select name="inputC0-telkomsel" id="radioC0Id" class="form-control">
+        							  <option value='900-51' >#51: 945.2 MHz downlink / 900.2 MHz uplink</option>
+        							  <option value='900-52' >#52: 945.4 MHz downlink / 900.4 MHz uplink</option>
+        							  <option value='900-53' >#53: 945.6 MHz downlink / 900.6 MHz uplink</option>
+        							  <option value='900-54' >#54: 945.8 MHz downlink / 900.8 MHz uplink</option>
+        							  <option value='900-55' >#55: 946 MHz downlink / 901 MHz uplink</option>
+        							  <option value='900-56' >#56: 946.2 MHz downlink / 901.2 MHz uplink</option>
+        							  <option value='900-57' >#57: 946.4 MHz downlink / 901.4 MHz uplink</option>
+        							  <option value='900-58' >#58: 946.6 MHz downlink / 901.6 MHz uplink</option>
+        							  <option value='900-59' >#59: 946.8 MHz downlink / 901.8 MHz uplink</option>
+        							  <option value='900-60' >#60: 947 MHz downlink / 902 MHz uplink</option>
+        							  <option value='900-61' >#61: 947.2 MHz downlink / 902.2 MHz uplink</option>
+        							  <option value='900-62' >#62: 947.4 MHz downlink / 902.4 MHz uplink</option>
+        							  <option value='900-63' >#63: 947.6 MHz downlink / 902.6 MHz uplink</option>
+        							  <option value='900-64' >#64: 947.8 MHz downlink / 902.8 MHz uplink</option>
+        							  <option value='900-65' >#65: 948 MHz downlink / 903 MHz uplink</option>
+        							  <option value='900-66' >#66: 948.2 MHz downlink / 903.2 MHz uplink</option>
+        							  <option value='900-67' >#67: 948.4 MHz downlink / 903.4 MHz uplink</option>
+        							  <option value='900-68' >#68: 948.6 MHz downlink / 903.6 MHz uplink</option>
+        							  <option value='900-69' >#69: 948.8 MHz downlink / 903.8 MHz uplink</option>
+        							  <option value='900-70' >#70: 949 MHz downlink / 904 MHz uplink</option>
+        							  <option value='900-71' >#71: 949.2 MHz downlink / 904.2 MHz uplink</option>
+        							  <option value='900-72' >#72: 949.4 MHz downlink / 904.4 MHz uplink</option>
+        							  <option value='900-73' >#73: 949.6 MHz downlink / 904.6 MHz uplink</option>
+        							  <option value='900-74' >#74: 949.8 MHz downlink / 904.8 MHz uplink</option>
+        							  <option value='900-75' >#75: 950 MHz downlink / 905 MHz uplink</option>
+        							  <option value='900-76' >#76: 950.2 MHz downlink / 905.2 MHz uplink</option>
+        							  <option value='900-77' >#77: 950.4 MHz downlink / 905.4 MHz uplink</option>
+        							  <option value='900-78' >#78: 950.6 MHz downlink / 905.6 MHz uplink</option>
+        							  <option value='900-79' >#79: 950.8 MHz downlink / 905.8 MHz uplink</option>
+        							  <option value='900-80' >#80: 951 MHz downlink / 906 MHz uplink</option>
+        							  <option value='900-81' >#81: 951.2 MHz downlink / 906.2 MHz uplink</option>
+        							  <option value='900-82' >#82: 951.4 MHz downlink / 906.4 MHz uplink</option>
+        							  <option value='900-83' >#83: 951.6 MHz downlink / 906.6 MHz uplink</option>
+        							  <option value='900-84' >#84: 951.8 MHz downlink / 906.8 MHz uplink</option>
+        							  <option value='900-85' >#85: 952 MHz downlink / 907 MHz uplink</option>
+        							  <option value='900-86' >#86: 952.2 MHz downlink / 907.2 MHz uplink</option>
+        							  <option value='900-87' >#87: 952.4 MHz downlink / 907.4 MHz uplink</option>
+        						  </select>
+        					  </div>
+                  </div>
+					       <div class="col-md-10" style="display: inline-flex;">
+                    <div class="col-md-4">
+                      <input id="bc-broadcast" class="styled" type="checkbox">
+                        <label for="bc-broadcast">
+                          XL
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                      <select name="inputC0-xl" id="radioC0Id" class="form-control">
+                        <option value='900-88' >#88: 952.6 MHz downlink / 907.6 MHz uplink</option>
+                        <option value='900-89' >#89: 952.8 MHz downlink / 907.8 MHz uplink</option>
+                        <option value='900-90' >#90: 953 MHz downlink / 908 MHz uplink</option>
+                        <option value='900-91' >#91: 953.2 MHz downlink / 908.2 MHz uplink</option>
+                        <option value='900-92' >#92: 953.4 MHz downlink / 908.4 MHz uplink</option>
+                        <option value='900-93' >#93: 953.6 MHz downlink / 908.6 MHz uplink</option>
+                        <option value='900-94' >#94: 953.8 MHz downlink / 908.8 MHz uplink</option>
+                        <option value='900-95' >#95: 954 MHz downlink / 909 MHz uplink</option>
+                        <option value='900-96' >#96: 954.2 MHz downlink / 909.2 MHz uplink</option>
+                        <option value='900-97' >#97: 954.4 MHz downlink / 909.4 MHz uplink</option>
+                        <option value='900-98' >#98: 954.6 MHz downlink / 909.6 MHz uplink</option>
+                        <option value='900-99' >#99: 954.8 MHz downlink / 909.8 MHz uplink</option>
+                        <option value='900-100' selected >#100: 955 MHz downlink / 910 MHz uplink</option>
+                        <option value='900-101' >#101: 955.2 MHz downlink / 910.2 MHz uplink</option>
+                        <option value='900-102' >#102: 955.4 MHz downlink / 910.4 MHz uplink</option>
+                        <option value='900-103' >#103: 955.6 MHz downlink / 910.6 MHz uplink</option>
+                        <option value='900-104' >#104: 955.8 MHz downlink / 910.8 MHz uplink</option>
+                        <option value='900-105' >#105: 956 MHz downlink / 911 MHz uplink</option>
+                        <option value='900-106' >#106: 956.2 MHz downlink / 911.2 MHz uplink</option>
+                        <option value='900-107' >#107: 956.4 MHz downlink / 911.4 MHz uplink</option>
+                        <option value='900-108' >#108: 956.6 MHz downlink / 911.6 MHz uplink</option>
+                        <option value='900-109' >#109: 956.8 MHz downlink / 911.8 MHz uplink</option>
+                        <option value='900-110' >#110: 957 MHz downlink / 912 MHz uplink</option>
+                        <option value='900-111' >#111: 957.2 MHz downlink / 912.2 MHz uplink</option>
+                        <option value='900-112' >#112: 957.4 MHz downlink / 912.4 MHz uplink</option>
+                        <option value='900-113' >#113: 957.6 MHz downlink / 912.6 MHz uplink</option>
+                        <option value='900-114' >#114: 957.8 MHz downlink / 912.8 MHz uplink</option>
+                        <option value='900-115' >#115: 958 MHz downlink / 913 MHz uplink</option>
+                        <option value='900-116' >#116: 958.2 MHz downlink / 913.2 MHz uplink</option>
+                        <option value='900-117' >#117: 958.4 MHz downlink / 913.4 MHz uplink</option>
+                        <option value='900-118' >#118: 958.6 MHz downlink / 913.6 MHz uplink</option>
+                        <option value='900-119' >#119: 958.8 MHz downlink / 913.8 MHz uplink</option>
+                        <option value='900-120' >#120: 959 MHz downlink / 914 MHz uplink</option>
+                        <option value='900-121' >#121: 959.2 MHz downlink / 914.2 MHz uplink</option>
+                        <option value='900-122' >#122: 959.4 MHz downlink / 914.4 MHz uplink</option>
+                        <option value='900-123' >#123: 959.6 MHz downlink / 914.6 MHz uplink</option>
+                        <option value='900-124' >#124: 959.8 MHz downlink / 914.8 MHz uplink</option>
+                      </select>
+                    </div>
+                  </div>
+  					       <div class="col-md-10" style="display: inline-flex;">
+                      <div class="col-md-4">
+                        <input id="bc-broadcast" class="styled" type="checkbox">
+                          <label for="bc-broadcast">
+                            Indosat
+                          </label>
+                      </div>
+                      <div class="col-md-6">
+                        <select name="inputC0-indosat" id="radioC0Id" class="form-control">
+                          <option value='900-1' >#1: 935.2 MHz downlink / 890.2 MHz uplink</option>
+                          <option value='900-2' >#2: 935.4 MHz downlink / 890.4 MHz uplink</option>
+                          <option value='900-3' >#3: 935.6 MHz downlink / 890.6 MHz uplink</option>
+                          <option value='900-4' >#4: 935.8 MHz downlink / 890.8 MHz uplink</option>
+                          <option value='900-5' >#5: 936 MHz downlink / 891 MHz uplink</option>
+                          <option value='900-6' >#6: 936.2 MHz downlink / 891.2 MHz uplink</option>
+                          <option value='900-7' >#7: 936.4 MHz downlink / 891.4 MHz uplink</option>
+                          <option value='900-8' >#8: 936.6 MHz downlink / 891.6 MHz uplink</option>
+                          <option value='900-9' >#9: 936.8 MHz downlink / 891.8 MHz uplink</option>
+                          <option value='900-10' >#10: 937 MHz downlink / 892 MHz uplink</option>
+                          <option value='900-11' >#11: 937.2 MHz downlink / 892.2 MHz uplink</option>
+                          <option value='900-12' >#12: 937.4 MHz downlink / 892.4 MHz uplink</option>
+                          <option value='900-13' >#13: 937.6 MHz downlink / 892.6 MHz uplink</option>
+                          <option value='900-14' >#14: 937.8 MHz downlink / 892.8 MHz uplink</option>
+                          <option value='900-15' >#15: 938 MHz downlink / 893 MHz uplink</option>
+                          <option value='900-16' >#16: 938.2 MHz downlink / 893.2 MHz uplink</option>
+                          <option value='900-17' >#17: 938.4 MHz downlink / 893.4 MHz uplink</option>
+                          <option value='900-18' >#18: 938.6 MHz downlink / 893.6 MHz uplink</option>
+                          <option value='900-19' >#19: 938.8 MHz downlink / 893.8 MHz uplink</option>
+                          <option value='900-20' >#20: 939 MHz downlink / 894 MHz uplink</option>
+                          <option value='900-21' >#21: 939.2 MHz downlink / 894.2 MHz uplink</option>
+                          <option value='900-22' >#22: 939.4 MHz downlink / 894.4 MHz uplink</option>
+                          <option value='900-23' >#23: 939.6 MHz downlink / 894.6 MHz uplink</option>
+                          <option value='900-24' >#24: 939.8 MHz downlink / 894.8 MHz uplink</option>
+                          <option value='900-25' selected>#25: 940 MHz downlink / 895 MHz uplink</option>
+                          <option value='900-26' >#26: 940.2 MHz downlink / 895.2 MHz uplink</option>
+                          <option value='900-27' >#27: 940.4 MHz downlink / 895.4 MHz uplink</option>
+                          <option value='900-28' >#28: 940.6 MHz downlink / 895.6 MHz uplink</option>
+                          <option value='900-29' >#29: 940.8 MHz downlink / 895.8 MHz uplink</option>
+                          <option value='900-30' >#30: 941 MHz downlink / 896 MHz uplink</option>
+                          <option value='900-31' >#31: 941.2 MHz downlink / 896.2 MHz uplink</option>
+                          <option value='900-32' >#32: 941.4 MHz downlink / 896.4 MHz uplink</option>
+                          <option value='900-33' >#33: 941.6 MHz downlink / 896.6 MHz uplink</option>
+                          <option value='900-34' >#34: 941.8 MHz downlink / 896.8 MHz uplink</option>
+                          <option value='900-35' >#35: 942 MHz downlink / 897 MHz uplink</option>
+                          <option value='900-36' >#36: 942.2 MHz downlink / 897.2 MHz uplink</option>
+                          <option value='900-37' >#37: 942.4 MHz downlink / 897.4 MHz uplink</option>
+                          <option value='900-38' >#38: 942.6 MHz downlink / 897.6 MHz uplink</option>
+                          <option value='900-39' >#39: 942.8 MHz downlink / 897.8 MHz uplink</option>
+                          <option value='900-40' >#40: 943 MHz downlink / 898 MHz uplink</option>
+                          <option value='900-41' >#41: 943.2 MHz downlink / 898.2 MHz uplink</option>
+                          <option value='900-42' >#42: 943.4 MHz downlink / 898.4 MHz uplink</option>
+                          <option value='900-43' >#43: 943.6 MHz downlink / 898.6 MHz uplink</option>
+                          <option value='900-44' >#44: 943.8 MHz downlink / 898.8 MHz uplink</option>
+                          <option value='900-45' >#45: 944 MHz downlink / 899 MHz uplink</option>
+                          <option value='900-46' >#46: 944.2 MHz downlink / 899.2 MHz uplink</option>
+                          <option value='900-47' >#47: 944.4 MHz downlink / 899.4 MHz uplink</option>
+                          <option value='900-48' >#48: 944.6 MHz downlink / 899.6 MHz uplink</option>
+                          <option value='900-49' >#49: 944.8 MHz downlink / 899.8 MHz uplink</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-10" style="display: inline-flex;">
+                    <div class="col-md-4">
+                      <input id="bc-broadcast" class="styled" type="checkbox">
+                        <label for="bc-broadcast">
+                          AXIS
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                      <select name="inputC0-axis" id="radioC0Id" class="form-control">
+                        <option value='900-88' >#88: 952.6 MHz downlink / 907.6 MHz uplink</option>
+                        <option value='900-89' >#89: 952.8 MHz downlink / 907.8 MHz uplink</option>
+                        <option value='900-90' >#90: 953 MHz downlink / 908 MHz uplink</option>
+                        <option value='900-91' >#91: 953.2 MHz downlink / 908.2 MHz uplink</option>
+                        <option value='900-92' >#92: 953.4 MHz downlink / 908.4 MHz uplink</option>
+                        <option value='900-93' >#93: 953.6 MHz downlink / 908.6 MHz uplink</option>
+                        <option value='900-94' >#94: 953.8 MHz downlink / 908.8 MHz uplink</option>
+                        <option value='900-95' >#95: 954 MHz downlink / 909 MHz uplink</option>
+                        <option value='900-96' >#96: 954.2 MHz downlink / 909.2 MHz uplink</option>
+                        <option value='900-97' >#97: 954.4 MHz downlink / 909.4 MHz uplink</option>
+                        <option value='900-98' >#98: 954.6 MHz downlink / 909.6 MHz uplink</option>
+                        <option value='900-99' >#99: 954.8 MHz downlink / 909.8 MHz uplink</option>
+                        <option value='900-100' selected >#100: 955 MHz downlink / 910 MHz uplink</option>
+                        <option value='900-101' >#101: 955.2 MHz downlink / 910.2 MHz uplink</option>
+                        <option value='900-102' >#102: 955.4 MHz downlink / 910.4 MHz uplink</option>
+                        <option value='900-103' >#103: 955.6 MHz downlink / 910.6 MHz uplink</option>
+                        <option value='900-104' >#104: 955.8 MHz downlink / 910.8 MHz uplink</option>
+                        <option value='900-105' >#105: 956 MHz downlink / 911 MHz uplink</option>
+                        <option value='900-106' >#106: 956.2 MHz downlink / 911.2 MHz uplink</option>
+                        <option value='900-107' >#107: 956.4 MHz downlink / 911.4 MHz uplink</option>
+                        <option value='900-108' >#108: 956.6 MHz downlink / 911.6 MHz uplink</option>
+                        <option value='900-109' >#109: 956.8 MHz downlink / 911.8 MHz uplink</option>
+                        <option value='900-110' >#110: 957 MHz downlink / 912 MHz uplink</option>
+                        <option value='900-111' >#111: 957.2 MHz downlink / 912.2 MHz uplink</option>
+                        <option value='900-112' >#112: 957.4 MHz downlink / 912.4 MHz uplink</option>
+                        <option value='900-113' >#113: 957.6 MHz downlink / 912.6 MHz uplink</option>
+                        <option value='900-114' >#114: 957.8 MHz downlink / 912.8 MHz uplink</option>
+                        <option value='900-115' >#115: 958 MHz downlink / 913 MHz uplink</option>
+                        <option value='900-116' >#116: 958.2 MHz downlink / 913.2 MHz uplink</option>
+                        <option value='900-117' >#117: 958.4 MHz downlink / 913.4 MHz uplink</option>
+                        <option value='900-118' >#118: 958.6 MHz downlink / 913.6 MHz uplink</option>
+                        <option value='900-119' >#119: 958.8 MHz downlink / 913.8 MHz uplink</option>
+                        <option value='900-120' >#120: 959 MHz downlink / 914 MHz uplink</option>
+                        <option value='900-121' >#121: 959.2 MHz downlink / 914.2 MHz uplink</option>
+                        <option value='900-122' >#122: 959.4 MHz downlink / 914.4 MHz uplink</option>
+                        <option value='900-123' >#123: 959.6 MHz downlink / 914.6 MHz uplink</option>
+                        <option value='900-124' >#124: 959.8 MHz downlink / 914.8 MHz uplink</option>
+                      </select>
+                    </div>
+                  </div>
+					       <div class="col-md-10" style="display: inline-flex;">
+                      <div class="col-md-4">
+                        <input id="bc-broadcast" class="styled" type="checkbox">
+                          <label for="bc-broadcast">
+                            Hutchinson 3
+                          </label>
+                      </div>
+                      <div class="col-md-6">
+                        <select name="inputC0-indosat" id="radioC0Id" class="form-control">
+                          <option value='900-1' >#1: 935.2 MHz downlink / 890.2 MHz uplink</option>
+                          <option value='900-2' >#2: 935.4 MHz downlink / 890.4 MHz uplink</option>
+                          <option value='900-3' >#3: 935.6 MHz downlink / 890.6 MHz uplink</option>
+                          <option value='900-4' >#4: 935.8 MHz downlink / 890.8 MHz uplink</option>
+                          <option value='900-5' >#5: 936 MHz downlink / 891 MHz uplink</option>
+                          <option value='900-6' >#6: 936.2 MHz downlink / 891.2 MHz uplink</option>
+                          <option value='900-7' >#7: 936.4 MHz downlink / 891.4 MHz uplink</option>
+                          <option value='900-8' >#8: 936.6 MHz downlink / 891.6 MHz uplink</option>
+                          <option value='900-9' >#9: 936.8 MHz downlink / 891.8 MHz uplink</option>
+                          <option value='900-10' >#10: 937 MHz downlink / 892 MHz uplink</option>
+                          <option value='900-11' >#11: 937.2 MHz downlink / 892.2 MHz uplink</option>
+                          <option value='900-12' >#12: 937.4 MHz downlink / 892.4 MHz uplink</option>
+                          <option value='900-13' >#13: 937.6 MHz downlink / 892.6 MHz uplink</option>
+                          <option value='900-14' >#14: 937.8 MHz downlink / 892.8 MHz uplink</option>
+                          <option value='900-15' >#15: 938 MHz downlink / 893 MHz uplink</option>
+                          <option value='900-16' >#16: 938.2 MHz downlink / 893.2 MHz uplink</option>
+                          <option value='900-17' >#17: 938.4 MHz downlink / 893.4 MHz uplink</option>
+                          <option value='900-18' >#18: 938.6 MHz downlink / 893.6 MHz uplink</option>
+                          <option value='900-19' >#19: 938.8 MHz downlink / 893.8 MHz uplink</option>
+                          <option value='900-20' >#20: 939 MHz downlink / 894 MHz uplink</option>
+                          <option value='900-21' >#21: 939.2 MHz downlink / 894.2 MHz uplink</option>
+                          <option value='900-22' >#22: 939.4 MHz downlink / 894.4 MHz uplink</option>
+                          <option value='900-23' >#23: 939.6 MHz downlink / 894.6 MHz uplink</option>
+                          <option value='900-24' >#24: 939.8 MHz downlink / 894.8 MHz uplink</option>
+                          <option value='900-25' selected>#25: 940 MHz downlink / 895 MHz uplink</option>
+                          <option value='900-26' >#26: 940.2 MHz downlink / 895.2 MHz uplink</option>
+                          <option value='900-27' >#27: 940.4 MHz downlink / 895.4 MHz uplink</option>
+                          <option value='900-28' >#28: 940.6 MHz downlink / 895.6 MHz uplink</option>
+                          <option value='900-29' >#29: 940.8 MHz downlink / 895.8 MHz uplink</option>
+                          <option value='900-30' >#30: 941 MHz downlink / 896 MHz uplink</option>
+                          <option value='900-31' >#31: 941.2 MHz downlink / 896.2 MHz uplink</option>
+                          <option value='900-32' >#32: 941.4 MHz downlink / 896.4 MHz uplink</option>
+                          <option value='900-33' >#33: 941.6 MHz downlink / 896.6 MHz uplink</option>
+                          <option value='900-34' >#34: 941.8 MHz downlink / 896.8 MHz uplink</option>
+                          <option value='900-35' >#35: 942 MHz downlink / 897 MHz uplink</option>
+                          <option value='900-36' >#36: 942.2 MHz downlink / 897.2 MHz uplink</option>
+                          <option value='900-37' >#37: 942.4 MHz downlink / 897.4 MHz uplink</option>
+                          <option value='900-38' >#38: 942.6 MHz downlink / 897.6 MHz uplink</option>
+                          <option value='900-39' >#39: 942.8 MHz downlink / 897.8 MHz uplink</option>
+                          <option value='900-40' >#40: 943 MHz downlink / 898 MHz uplink</option>
+                          <option value='900-41' >#41: 943.2 MHz downlink / 898.2 MHz uplink</option>
+                          <option value='900-42' >#42: 943.4 MHz downlink / 898.4 MHz uplink</option>
+                          <option value='900-43' >#43: 943.6 MHz downlink / 898.6 MHz uplink</option>
+                          <option value='900-44' >#44: 943.8 MHz downlink / 898.8 MHz uplink</option>
+                          <option value='900-45' >#45: 944 MHz downlink / 899 MHz uplink</option>
+                          <option value='900-46' >#46: 944.2 MHz downlink / 899.2 MHz uplink</option>
+                          <option value='900-47' >#47: 944.4 MHz downlink / 899.4 MHz uplink</option>
+                          <option value='900-48' >#48: 944.6 MHz downlink / 899.6 MHz uplink</option>
+                          <option value='900-49' >#49: 944.8 MHz downlink / 899.8 MHz uplink</option>
+                        </select>
+                      </div>
+                    </div>
+				  </div>
+			  </div>
                 <!-- <input type="text" name="inputMNC" value="<?php echo ($valueMCI);?>" maxlength="2" id="inputMNCId" class="form-control" style="width: 30%"> -->
                 <select name="inputMNC" id="inputMNCId" class="form-control" style="width: 30%">
                   <option value="10" <?php if ($valueMCI == 10 ) echo 'selected="selected"'; ?>>Telkomsel</option>
-                  <option value="11" <?php if ($valueMCI == 11 ) echo 'selected="selected"'; ?>>XL/AXIS</option>
-                  <option value="12" <?php if ($valueMCI == 12 ) echo 'selected="selected"'; ?>>Indosat</option>
+                  <option value="11" <?php if ($valueMCI == 11 ) echo 'selected="selected"'; ?>>XL</option>
+                  <option value="08" <?php if ($valueMCI == '08' ) echo 'selected="selected"'; ?>>AXIS</option>
+                  <option value="01" <?php if ($valueMCI == '01' ) echo 'selected="selected"'; ?>>Indosat</option>
+                  <option value="89" <?php if ($valueMCI == 89 ) echo 'selected="selected"'; ?>>Hutchinson 3</option>
                 </select>
               </div>
             </div>
@@ -1287,7 +1584,7 @@
   $("#inputMNCId").on('change', function() {
     if ($(this).val() == 10){
         $("#radioC0Id").val("900-60");
-    } else if ($(this).val() == 11){
+    } else if ($(this).val() == 11 || $(this).val() == '08'){
         $("#radioC0Id").val("900-100");
     } else {
         $("#radioC0Id").val("900-25");

@@ -21,7 +21,7 @@
   <link href="css/sb-admin.css" rel="stylesheet">
 </head>
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.php">SelaAktif</a>
@@ -30,31 +30,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -93,7 +93,7 @@
       <br>
       <?php
       if (isset($_GET["restartYate"])) {
-         $var = shell_exec('whoami');
+         $var = shell_exec('sudo reboot');
          echo "<pre>$var</pre>";
       }
       if (isset($_GET["restartRaspi"])) {

@@ -22,7 +22,7 @@
 </head>
 
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.html">SelaAktif</a>
@@ -31,31 +31,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -177,18 +177,18 @@
     error_reporting(E_ALL);
 
     //$filename = "/usr/local/etc/yate/ybts.conf";
-    $filename = "ybts.conf";
-    $fd = fopen($filename,"r");
-    $textFileContents = fread($fd,filesize($filename));
-    fclose($fd);
-    $valueMCI = substr($textFileContents, strpos($textFileContents, "Identity.MNC=")+13, 2);
+    // $filename = "ybts.conf";
+    // $fd = fopen($filename,"r");
+    // $textFileContents = fread($fd,filesize($filename));
+    // fclose($fd);
+    // $valueMCI = substr($textFileContents, strpos($textFileContents, "Identity.MNC=")+13, 2);
 
-    if($valueMCI==10)
-      $_SESSION["operator"] = "Telkomsel";
-    else if($valueMCI == 11)
-      $_SESSION["operator"] = "XL/AXIS";
-    else
-      $_SESSION["operator"] = "Indosat";
+    // if($valueMCI==10)
+    //   $_SESSION["operator"] = "Telkomsel";
+    // else if($valueMCI == 11)
+    //   $_SESSION["operator"] = "XL/AXIS";
+    // else
+    //   $_SESSION["operator"] = "Indosat";
     
     if (isset($_POST['frmSub'])) {
       echo ('<script>alert("aaa")</script>');
@@ -211,44 +211,40 @@
           <i class="fa fa-podcast"></i> Jammer A</div>
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-            <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+			<div class="form-group row">
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800">1800</option>
-                  <option value="2100">2100</option>
-                  <option value="2300" selected>2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="4" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="14" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Tipe Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk" selected>BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk">DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="14" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="10">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="1800" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="10" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="5" min="0" max="20">
               </div>
             </div>
             <br>
@@ -263,44 +259,40 @@
           <i class="fa fa-podcast"></i> Jammer B</div>
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-            <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+			<div class="form-group row">
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800" selected>1800</option>
-                  <option value="2100">2100</option>
-                  <option value="2300">2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="10" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20" selected>20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="10" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk">BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk">DPSK</option>
-                  <option value="qam16" selected>16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="18" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="15">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="1820" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="12" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="2" min="0" max="20">
               </div>
             </div>
             <br>
@@ -316,43 +308,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800">1800</option>
-                  <option value="2100" selected>2100</option>
-                  <option value="2300">2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="6" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15" selected>15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="30" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk" selected>BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk"selected>DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="26" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="3">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="1840" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="14" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="6" min="0" max="20">
               </div>
             </div>
             <br>
@@ -371,43 +359,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800"selected>1800</option>
-                  <option value="2100">2100</option>
-                  <option value="2300">2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="16" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25" selected>25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="22" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk" selected>BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk"selected>DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="20" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="6">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="1860" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="42" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="12" min="0" max="20">
               </div>
             </div>
             <br>
@@ -423,43 +407,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800">1800</option>
-                  <option value="2100" selected>2100</option>
-                  <option value="2300">2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="4" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10" selected>10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="10" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk">BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk">DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64"selected>64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="22" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="4">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="920" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="18" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="1" min="0" max="20">
               </div>
             </div>
             <br>
@@ -475,43 +455,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800">1800</option>
-                  <option value="2100">2100</option>
-                  <option value="2300" selected>2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="14" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20" selected>20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="32" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk">BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk"selected>DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="16" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="10">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="940" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="28" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="8" min="0" max="20">
               </div>
             </div>
             <br>
@@ -530,43 +506,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800">1800</option>
-                  <option value="2100">2100</option>
-                  <option value="2300">2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="10" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="21" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk" selected>BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk"selected>DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="14" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="11">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="910" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="14" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="2" min="0" max="20">
               </div>
             </div>
             <br>
@@ -582,42 +554,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800"selected>1800</option>
-                  <option value="2100">2100</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="14" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10" selected>10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="28" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk" >BPSK</option>
-                  <option value="qpsk"selected>QPSK</option>
-                  <option value="dpsk">DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="42" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="20">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="950" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="14" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="5" min="0" max="20">
               </div>
             </div>
             <br>
@@ -633,43 +602,39 @@
         <div class="card-body">
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband (MHz)</label>
+              <label for="samprate_id" class="col-sm-5 col-form-label">Sample Rate (MHz)</label>
               <div class="col-sm-7">
-                <select name="baseband_name" id="baseband_id" class="form-control" style="width: 90%">
-                  <option value="1800">1800</option>
-                  <option value="2100"selected>2100</option>
-                  <option value="2300">2300</option>
-                </select>
+                <input type="number" name="samprate" id="samprate_id" placeholder="MHz" class="form-control" style="width: 90%" value="2" min="2" max="20">
               </div>
             </div>
             <div class="form-group row">
-              <label for="bandwidth_id" class="col-sm-5 col-form-label">Bandwidth (MHz)</label>
+              <label for="ifgain_id" class="col-sm-5 col-form-label">IF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="bandwidth_name" id="bandwidth_id" class="form-control" style="width: 90%">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15" selected>15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
+                <input type="number" name="ifgain" id="ifgain_id" placeholder="dB" class="form-control" style="width: 90%" value="10" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="modulasi_id" class="col-sm-5 col-form-label">Modulasi</label>
+              <label for="rfgain_id" class="col-sm-5 col-form-label">RF Gain (dB)</label>
               <div class="col-sm-7">
-                <select name="modulasi_name" id="modulasi_id" class="form-control" style="width: 90%">
-                  <option value="bpsk" selected>BPSK</option>
-                  <option value="qpsk">QPSK</option>
-                  <option value="dpsk">DPSK</option>
-                  <option value="qam16">16-QAM</option>
-                  <option value="qam64">64-QAM</option>
-                </select>
+                <input type="number" name="rfgain" id="rfgain_id" placeholder="dB" class="form-control" style="width: 90%" value="10" min="10" max="60">
               </div>
             </div>
             <div class="form-group row">
-              <label for="power_id" class="col-sm-5 col-form-label">Power (dB)</label>
+              <label for="frek_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
               <div class="col-sm-7">
-                <input type="number" name="power_name" placeholder="dB" class="form-control" style="width: 90%" value="10">
+                <input type="number" name="frek" id="frek_id" placeholder="MHz" class="form-control" style="width: 90%" value="960" min="900" max="2200" step="10">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="baseband_id" class="col-sm-5 col-form-label">Baseband Gain (dB)</label>
+              <div class="col-sm-7">
+                <input type="number" name="baseband_name" placeholder="dB" class="form-control" style="width: 90%" value="10" min="10" max="60">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="bandwidth_id" class="col-sm-5 col-form-label">Frekuensi (MHz)</label>
+              <div class="col-sm-7">
+                <input type="number" name="bandwidth" id="bandwidth_id" placeholder="MHz" class="form-control" style="width: 90%" value="0" min="0" max="20">
               </div>
             </div>
             <br>

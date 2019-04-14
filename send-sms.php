@@ -24,7 +24,7 @@
 </head>
 
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark sidenav-toggled" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <a class="navbar-brand" href="index.html">SelaAktif</a>
@@ -33,31 +33,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link" href="index.php">
             <i class="fa fa-fw fa-gears"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="SMS Send">
           <a class="nav-link" href="send-sms.php">
             <i class="fa fa-fw fa-send"></i>
             <span class="nav-link-text">Send SMS</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Mobile List">
           <a class="nav-link" href="mobile-list.php">
             <i class="fa fa-fw fa-mobile"></i>
             <span class="nav-link-text">Mobile List</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Restart">
           <a class="nav-link" href="restart.php">
             <i class="fa fa-fw fa-refresh"></i>
             <span class="nav-link-text">Restart Device</span>
           </a>
         </li> 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Jammer Config">
           <a class="nav-link" href="jammer-conf.php">
             <i class="fa fa-fw fa-signal"></i>
             <span class="nav-link-text">Jammer Configuration</span>
@@ -178,8 +178,8 @@
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
     
-    //$filename = "/usr/local/etc/yate/tmsidata.conf";
-    $filename = "tmsidata.conf";
+    $filename = "/usr/local/etc/yate/tmsidata.conf";
+    //$filename = "tmsidata.conf";
   	$fd = fopen($filename,"r");
   	$textFileContents = fread($fd,filesize($filename));
   	$ues = substr($textFileContents, strpos($textFileContents, "[ues]")+5);
@@ -195,16 +195,22 @@
     if (isset($_POST['smsForm'])) {
   		$sendResult = array();
   		$sendText = $_POST['textToSend'];
+  		$sendNumber = $_POST['numberToSend'];
   		if($sendText==""){
   			$sendText = "Selamat Datang";
   		}
+  		//var_dump($_POST['msisdnNumber'], count($_POST['msisdnNumber']));
+  		if(array_key_exists("msisdnNumber", $_POST)) {
+			$msisdn = $_POST['msisdnNumber'];
+		} 
+		
   		foreach (($msisdn) as $msisdnItem) {
   			$connectTelnet = fsockopen("localhost", 5038, $errno, $errstr, 30);
   			if(!$connectTelnet){
   				echo "salaahh";
   			} else {
   				$out = fgets($connectTelnet, 1024);				
-  				$sendTemplate = "smssend ".$msisdnItem." ITB ".$sendText;
+  				$sendTemplate = "smssend ".$msisdnItem." ".$sendNumber." ".$sendText;
   				usleep(500000);
   				fputs($connectTelnet, $sendTemplate."\r\n");
   				$out = fgets($connectTelnet, 1024);
@@ -214,7 +220,7 @@
   					array_push($sendResult, "Failed to send to ".$msisdnItem."\r\n");
   				}
   			}
-  			fclose($connectTelnet);
+  			fclose($connectTelnet); 
   		}
     }
   ?>
@@ -234,9 +240,9 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-7">
-                <input type="text" name="numberToSend" placeholder="Sender Number" class="form-control" style="width: 40%">
-                <br>
                 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+                  <input type="text" name="numberToSend" placeholder="Nomor Pengirim" class="form-control" style="width: 40%">
+                  <br>
                   <div class="form-group row">
                     <div class="col-sm-10">
                       <textarea name="textToSend" placeholder="Hi! Welcome to Indonesia" rows="7" cols="100" class="form-control"></textarea>
@@ -247,7 +253,6 @@
                       <input class="btn btn-primary btn-block" type="submit" name="smsForm" value="SEND" style="width: 20%">                
                     </div>
                   </div>
-                </form>
               </div>
               <div class="col-md-4" style="border-left: 1px solid grey">
                 <fieldset>
@@ -271,7 +276,7 @@
                       foreach ($msisdn as $msisdn_ind) {
                         $i++;
                         echo ('<div id="dynamic-cb" class="checkbox checkbox-circle">');
-                        echo ('<input id="cb'.$i.'" class="styled" type="checkbox">');
+                        echo ('<input id="cb'.$i.'" value= "'.$msisdn_ind.'" class="styled" name="msisdnNumber[]" type="checkbox">');
                         echo ('<label for="cb'.$i.'">');
                         echo ($msisdn_ind);
                         echo ('</label>');
@@ -281,6 +286,7 @@
                 </fieldset>
               </div>
               </div>
+			</form>
             </div>
       </div>
       
@@ -345,6 +351,7 @@
 
   $("input[id^='cb']").click(function() {
     $('#bc-broadcast').prop('checked', false);
+    
   });
 
   $("input[id^='bc']").click(function() {
