@@ -18,7 +18,9 @@
   <!-- Page level plugin CSS-->
   <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
   <!-- Custom styles for this template-->
+  <link href="vendor/bootstrap/css/awesome-bootstrap-checkbox.css" rel="stylesheet">
   <link href="css/sb-admin.css" rel="stylesheet">
+
 </head>
 
 
@@ -197,11 +199,35 @@
       $_SESSION["operator"] = "AXIS";
     else
       $_SESSION["operator"] = "Indosat";
+
+    // untuk template.conf
+    $filename_template = "template.conf";
+    $fd_template = fopen($filename_template,"r");
+    $textFileContents_template = fread($fd_template,filesize($filename_template));
+    fclose($fd_template);
+    $atas = preg_replace("/[\n\r]/","",explode("\n", $textFileContents_template)[0]);
+    $bawah = preg_replace("/[\n\r]/","",explode("\n", $textFileContents_template)[1]);
     
     if (isset($_POST['frmSub'])) {
+
+      $fd_template = fopen("template.conf","w");
+      $template = "";
+      $templateArfcn = "";
+      foreach ($_POST["bc"] as $templateItem) {
+        $template = $template.$templateItem. "|";
+        $temp = explode("-", $_POST["inputC0-".$templateItem])[1];
+        $templateArfcn = $templateArfcn.$temp. "|";
+      }
+      fwrite($fd_template, "".$template.PHP_EOL.$templateArfcn);
+      fclose($fd_template);
+      
+      echo "<meta http-equiv='refresh' content='0'>";
+
+      
+
 	  //$var = shell_exec('sudo pkill yate');
 	  //usleep(1000000);
-      $tempResult= $textFileContents;
+      /*$tempResult= $textFileContents;
       $resultToReplace = "Identity.MNC=".$valueMCI;
       $resultForReplace = "Identity.MNC=".$_POST['inputMNC'];
       echo "<script>console.log('".$resultToReplace."');</script>";
@@ -237,7 +263,8 @@
     		fputs($connectTelnet, $sendTemplate."\r\n");
     		$out = fgets($connectTelnet, 1024);
   	  }
-	     fclose($connectTelnet);
+	    
+      fclose($connectTelnet);*/
       session_destroy();
     }
   ?>
@@ -258,18 +285,18 @@
           Changing these advanced settings can sometimes break Device or cause strange behavior.<br><br><br>
           <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
             <div class="form-group row">
-              <label for="inputMNCId" class="col-sm-2 col-form-label">Identity MNC</label>
+              <label for="inputMNCId" class="col-sm-2 col-form-label">Pilih Operator</label>
               <div class="col-sm-10">
-      				  <div class="checkbox checkbox-info checkbox-circle">
+                <div class="checkbox checkbox-info checkbox-circle">
                   <div class="col-md-10" style="display: inline-flex;">
-        					  <div class="col-md-4">
-        						  <input id="bc-broadcast" class="styled" type="checkbox">
-          						  <label for="bc-broadcast">
+        					  <div class="col-md-3">
+        						  <input id="bc-broadcast-telkomsel" class="styled" type="checkbox" name="bc[]" value="telkomsel">
+          						  <label for="bc-broadcast-telkomsel">
           							  Telkomsel
           						  </label>
         					  </div>
         					  <div class="col-md-6">
-        						  <select name="inputC0-telkomsel" id="radioC0Id" class="form-control">
+        						  <select name="inputC0-telkomsel" id="radioC0Id-telkomsel" class="form-control" disabled>
         							  <option value='900-51' >#51: 945.2 MHz downlink / 900.2 MHz uplink</option>
         							  <option value='900-52' >#52: 945.4 MHz downlink / 900.4 MHz uplink</option>
         							  <option value='900-53' >#53: 945.6 MHz downlink / 900.6 MHz uplink</option>
@@ -310,15 +337,15 @@
         						  </select>
         					  </div>
                   </div>
-					       <div class="col-md-10" style="display: inline-flex;">
-                    <div class="col-md-4">
-                      <input id="bc-broadcast" class="styled" type="checkbox">
-                        <label for="bc-broadcast">
+					       <div class="col-md-10" style="display: inline-flex; margin-top: 15px;">
+                    <div class="col-md-3">
+                      <input id="bc-broadcast-xl" class="styled" type="checkbox" name="bc[]" value="xl">
+                        <label for="bc-broadcast-xl">
                           XL
                         </label>
                     </div>
                     <div class="col-md-6">
-                      <select name="inputC0-xl" id="radioC0Id" class="form-control">
+                      <select name="inputC0-xl" id="radioC0Id-xl" class="form-control" disabled>
                         <option value='900-88' >#88: 952.6 MHz downlink / 907.6 MHz uplink</option>
                         <option value='900-89' >#89: 952.8 MHz downlink / 907.8 MHz uplink</option>
                         <option value='900-90' >#90: 953 MHz downlink / 908 MHz uplink</option>
@@ -359,15 +386,15 @@
                       </select>
                     </div>
                   </div>
-  					       <div class="col-md-10" style="display: inline-flex;">
-                      <div class="col-md-4">
-                        <input id="bc-broadcast" class="styled" type="checkbox">
-                          <label for="bc-broadcast">
+  					       <div class="col-md-10" style="display: inline-flex; margin-top: 15px;">
+                      <div class="col-md-3">
+                        <input id="bc-broadcast-indosat" class="styled" type="checkbox" name="bc[]" value="indosat">
+                          <label for="bc-broadcast-indosat">
                             Indosat
                           </label>
                       </div>
                       <div class="col-md-6">
-                        <select name="inputC0-indosat" id="radioC0Id" class="form-control">
+                        <select name="inputC0-indosat" id="radioC0Id-indosat" class="form-control" disabled>
                           <option value='900-1' >#1: 935.2 MHz downlink / 890.2 MHz uplink</option>
                           <option value='900-2' >#2: 935.4 MHz downlink / 890.4 MHz uplink</option>
                           <option value='900-3' >#3: 935.6 MHz downlink / 890.6 MHz uplink</option>
@@ -420,15 +447,15 @@
                         </select>
                       </div>
                     </div>
-                    <div class="col-md-10" style="display: inline-flex;">
-                    <div class="col-md-4">
-                      <input id="bc-broadcast" class="styled" type="checkbox">
-                        <label for="bc-broadcast">
+                    <div class="col-md-10" style="display: inline-flex; margin-top: 15px;">
+                    <div class="col-md-3">
+                      <input id="bc-broadcast-axis" class="styled" type="checkbox" name="bc[]" value="axis">
+                        <label for="bc-broadcast-axis">
                           AXIS
                         </label>
                     </div>
                     <div class="col-md-6">
-                      <select name="inputC0-axis" id="radioC0Id" class="form-control">
+                      <select name="inputC0-axis" id="radioC0Id-axis" class="form-control" disabled>
                         <option value='900-88' >#88: 952.6 MHz downlink / 907.6 MHz uplink</option>
                         <option value='900-89' >#89: 952.8 MHz downlink / 907.8 MHz uplink</option>
                         <option value='900-90' >#90: 953 MHz downlink / 908 MHz uplink</option>
@@ -469,15 +496,15 @@
                       </select>
                     </div>
                   </div>
-					       <div class="col-md-10" style="display: inline-flex;">
-                      <div class="col-md-4">
-                        <input id="bc-broadcast" class="styled" type="checkbox">
-                          <label for="bc-broadcast">
+					       <div class="col-md-10" style="display: inline-flex; margin-top: 15px;">
+                      <div class="col-md-3">
+                        <input id="bc-broadcast-three" class="styled" type="checkbox" name="bc[]" value="three">
+                          <label for="bc-broadcast-three">
                             Hutchinson 3
                           </label>
                       </div>
                       <div class="col-md-6">
-                        <select name="inputC0-indosat" id="radioC0Id" class="form-control">
+                        <select name="inputC0-three" id="radioC0Id-three" class="form-control" disabled>
                           <option value='900-1' >#1: 935.2 MHz downlink / 890.2 MHz uplink</option>
                           <option value='900-2' >#2: 935.4 MHz downlink / 890.4 MHz uplink</option>
                           <option value='900-3' >#3: 935.6 MHz downlink / 890.6 MHz uplink</option>
@@ -533,16 +560,16 @@
     				  </div>
     			  </div>
                 <!-- <input type="text" name="inputMNC" value="<?php echo ($valueMCI);?>" maxlength="2" id="inputMNCId" class="form-control" style="width: 30%"> -->
-                <select name="inputMNC" id="inputMNCId" class="form-control" style="width: 30%">
+                <!-- <select name="inputMNC" id="inputMNCId" class="form-control" style="width: 30%">
                   <option value="10" <?php if ($valueMCI == 10 ) echo 'selected="selected"'; ?>>Telkomsel</option>
                   <option value="11" <?php if ($valueMCI == 11 ) echo 'selected="selected"'; ?>>XL</option>
                   <option value="08" <?php if ($valueMCI == '08' ) echo 'selected="selected"'; ?>>AXIS</option>
                   <option value="01" <?php if ($valueMCI == '01' ) echo 'selected="selected"'; ?>>Indosat</option>
                   <option value="89" <?php if ($valueMCI == 89 ) echo 'selected="selected"'; ?>>Hutchinson 3</option>
                 </select>
-              </div>
+              </div> -->
             </div>
-            <div class="form-group row">
+            <!-- <div class="form-group row">
               <label for="radioC0Id" class="col-sm-2 col-form-label">Baseband</label>
               <div class="col-sm-10">
                 <select name="inputC0" id="radioC0Id" class="form-control" style="width: 30%">
@@ -1524,7 +1551,7 @@
                 </select>
                 </select>
               </div>
-            </div>
+            </div> -->
             <br>
             <div class="form-group row">
               <div class="col-sm-10">
@@ -1576,20 +1603,66 @@
 
 <script src="vendor/jquery/jquery.min.js"></script>
 <script>
-  
-  var valueRadioBand = <?php echo $valueRadioBand; ?>;
-  var valueRadioC0 = <?php echo $valueRadioC0; ?>;
-  $("#radioC0Id").val(valueRadioBand+"-"+valueRadioC0);
 
-  $("#inputMNCId").on('change', function() {
-    if ($(this).val() == 10){
-        $("#radioC0Id").val("900-60");
-    } else if ($(this).val() == 11 || $(this).val() == '08'){
-        $("#radioC0Id").val("900-100");
-    } else {
-        $("#radioC0Id").val("900-25");
-    }
-  });  
+  $("#bc-broadcast-telkomsel").on('change', function() {
+    if ($('#radioC0Id-telkomsel').prop("disabled") == true)
+      $('#radioC0Id-telkomsel').prop("disabled", false);
+    else 
+      $('#radioC0Id-telkomsel').prop("disabled", true);
+  })
+
+  $("#bc-broadcast-xl").on('change', function() {
+    if ($('#radioC0Id-xl').prop("disabled") == true)
+      $('#radioC0Id-xl').prop("disabled", false);
+    else 
+      $('#radioC0Id-xl').prop("disabled", true);
+  })
+
+  $("#bc-broadcast-indosat").on('change', function() {
+    if ($('#radioC0Id-indosat').prop("disabled") == true)
+      $('#radioC0Id-indosat').prop("disabled", false);
+    else 
+      $('#radioC0Id-indosat').prop("disabled", true);
+  })
+
+  $("#bc-broadcast-axis").on('change', function() {
+    if ($('#radioC0Id-axis').prop("disabled") == true)
+      $('#radioC0Id-axis').prop("disabled", false);
+    else 
+      $('#radioC0Id-axis').prop("disabled", true);
+  })
+
+  $("#bc-broadcast-three").on('change', function() {
+    if ($('#radioC0Id-three').prop("disabled") == true)
+      $('#radioC0Id-three').prop("disabled", false);
+    else 
+      $('#radioC0Id-three').prop("disabled", true);
+  })
+
+  var textTemplateAtas = ("<?php echo $atas; ?>").split("|");
+  var textTemplateBawah = ("<?php echo $bawah; ?>").split("|");
+  console.log(textTemplateAtas, textTemplateBawah);
+
+  for ($i = 0; $i<textTemplateAtas.length-1; $i++) {
+    $('#radioC0Id-'+textTemplateAtas[$i]).prop("disabled", false);
+    $('#bc-broadcast-'+textTemplateAtas[$i]).prop("checked", true);
+    $('#radioC0Id-'+textTemplateAtas[$i]).val('900-'+textTemplateBawah[$i]);
+    $('#radioC0Id-'+textTemplateAtas[$i]).change();
+  }
+  
+  // var valueRadioBand = <?php echo $valueRadioBand; ?>;
+  // var valueRadioC0 = <?php echo $valueRadioC0; ?>;
+  // $("#radioC0Id").val(valueRadioBand+"-"+valueRadioC0);
+
+  // $("#inputMNCId").on('change', function() {
+  //   if ($(this).val() == 10){
+  //       $("#radioC0Id").val("900-60");
+  //   } else if ($(this).val() == 11 || $(this).val() == '08'){
+  //       $("#radioC0Id").val("900-100");
+  //   } else {
+  //       $("#radioC0Id").val("900-25");
+  //   }
+  // });
 
 </script>
 </html>
