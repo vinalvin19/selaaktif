@@ -206,66 +206,78 @@
     $textFileContents_template = fread($fd_template,filesize($filename_template));
     fclose($fd_template);
     $atas = preg_replace("/[\n\r]/","",explode("\n", $textFileContents_template)[0]);
-    $bawah = preg_replace("/[\n\r]/","",explode("\n", $textFileContents_template)[1]);
+    $bawah = preg_replace("/[\n\r]/","",explode("\n", $textFileContents_template)[2]);
+    
+	// untuk interval.conf
+    $filename_interval = "interval.conf";
+    $fd_interval = fopen($filename_interval,"r");
+    $textFileContents_interval = fread($fd_interval,filesize($filename_interval));
+    fclose($fd_interval);
+    $interval_read = preg_replace("/[\n\r]/","",explode("\n", $textFileContents_interval)[0]);
+    
+    if (isset($_POST['intSub'])) {
+		$interval = $_POST['interval'];
+		
+		$fd_template = fopen("interval.conf","w");
+		fwrite($fd_template, "".$interval);
+		fclose($fd_template);
+		
+		echo "<meta http-equiv='refresh' content='0'>";		
+		
+		$var = shell_exec('sudo killall "php"');
+		usleep(500000);
+		$var_mulai = shell_exec("sudo nohup php processNohup.php > /dev/null 2>&1 &");
+	}
     
     if (isset($_POST['frmSub'])) {
+			$fd_template = fopen("template.conf","w");
+			$template = "";
+			$templateArfcn = "";
+			$templateMnc = "";
+			foreach ($_POST["bc"] as $templateItem) {
+			$template = $template.$templateItem. "|";
 
-      $fd_template = fopen("template.conf","w");
-      $template = "";
-      $templateArfcn = "";
-      foreach ($_POST["bc"] as $templateItem) {
-        $template = $template.$templateItem. "|";
-        $temp = explode("-", $_POST["inputC0-".$templateItem])[1];
-        $templateArfcn = $templateArfcn.$temp. "|";
-      }
-      fwrite($fd_template, "".$template.PHP_EOL.$templateArfcn);
-      fclose($fd_template);
-      
-      echo "<meta http-equiv='refresh' content='0'>";
+			if ($templateItem == 'telkomsel')
+				$tempMnc = '10';
+			else if ($templateItem == 'xl')
+				$tempMnc = '20';
+			else if ($templateItem == 'indosat')
+				$tempMnc = '30';
+			else if ($templateItem == 'axis')
+				$tempMnc = '20';
+			else if ($templateItem == 'three')
+				$tempMnc = '40';			
+			$templateMnc = $templateMnc.$tempMnc. "|";
 
-      
+			$temp = explode("-", $_POST["inputC0-".$templateItem])[1];
+			$templateArfcn = $templateArfcn.$temp. "|";
+		}
+		
+		//echo "<script>console.log('".$_POST["bc"]."');</script>";
+		fwrite($fd_template, "".$template.PHP_EOL.$templateMnc.PHP_EOL.$templateArfcn);
+		fclose($fd_template);
 
-	  //$var = shell_exec('sudo pkill yate');
-	  //usleep(1000000);
-      /*$tempResult= $textFileContents;
-      $resultToReplace = "Identity.MNC=".$valueMCI;
-      $resultForReplace = "Identity.MNC=".$_POST['inputMNC'];
-      echo "<script>console.log('".$resultToReplace."');</script>";
-      echo "<script>console.log('".$resultForReplace."');</script>";
-
-      $radioband_before = "Radio.Band=".$valueRadioBand;
-      $radic0_before = "Radio.C0=".$valueRadioC0;
-      $radioband_after = "Radio.Band=".explode("-", $_POST['inputC0'])[0];
-      $radic0_after = "Radio.C0=".explode("-", $_POST['inputC0'])[1];
-      echo "<script>console.log('".$radioband_after."+".$radic0_after."');</script>";
-
-      $before = array($resultToReplace, $radioband_before, $radic0_before);
-      $after = array($resultForReplace, $radioband_after, $radic0_after);
-      
-      $finalResult = str_replace($before,$after,$tempResult);
-      
-      $fd=fopen("/usr/local/etc/yate/ybts.conf","w");
-      //$fd=fopen("ybts.conf","w");
-      fwrite($fd, $finalResult);
-      echo "<meta http-equiv='refresh' content='0'>";
-      fclose($fd);
-      
-      //usleep(500000);
-      //`echo "sudo yate" | at now`;
-      //exec("sudo yate &");
-      $connectTelnet = fsockopen("localhost", 5038, $errno, $errstr, 30);
-  	  if(!$connectTelnet){
-  		    echo "salaahh";
-     	} else {
-    		$out = fgets($connectTelnet, 1024);				
-    		$sendTemplate = "reload";
-    		usleep(500000);
-    		fputs($connectTelnet, $sendTemplate."\r\n");
-    		$out = fgets($connectTelnet, 1024);
-  	  }
-	    
-      fclose($connectTelnet);*/
-      session_destroy();
+		echo "<meta http-equiv='refresh' content='0'>";
+		session_destroy();
+		
+		$connectTelnet = fsockopen("localhost", 5038, $errno, $errstr, 30);
+		if(!$connectTelnet){
+			echo "salaahh";
+		} else {
+			$out = fgets($connectTelnet, 1024);				
+			$sendTemplate = "reload";
+			usleep(500000);
+			fputs($connectTelnet, $sendTemplate."\r\n");
+			$out = fgets($connectTelnet, 1024);
+		}
+		fclose($connectTelnet);
+		
+		//$var = shell_exec("ps aux | grep 'nohup php processNohup.php' | awk {'print $2'}");
+		//$resp = preg_replace("/[\n\r]/","",explode("\n", $var)[0]);
+		//$var_destroy = shell_exec("sudo kill ".$resp);
+		$var = shell_exec('sudo killall "php"');
+		usleep(500000);
+		$var_mulai = shell_exec("sudo nohup php processNohup.php > /dev/null 2>&1 &");
     }
   ?>
   <div class="content-wrapper">
@@ -336,7 +348,7 @@
         							  <option value='900-87' >#87: 952.4 MHz downlink / 907.4 MHz uplink</option>
         						  </select>
         					  </div>
-                  </div>
+							</div>
 					       <div class="col-md-10" style="display: inline-flex; margin-top: 15px;">
                     <div class="col-md-3">
                       <input id="bc-broadcast-xl" class="styled" type="checkbox" name="bc[]" value="xl">
@@ -1561,6 +1573,26 @@
           </form>
         </div>
       </div>
+  
+	<div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-gears"></i> Time Interval</div>
+        <div class="card-body">
+          Atur waktu interval untuk siklus perpindahan operator (dalam detik).<br>
+		</div>
+		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+            <div class="form-group row">
+				<div class="col-md-6" style="display: inline-flex;">
+					<div class="col-md-6">
+						<input type="text" name="interval" placeholder="(dalam sec)" class="form-control" id="interval">
+					</div>
+					<div class="col-md-4">
+						<input class="btn btn-primary btn-block" type="submit" name="intSub" value="SET">
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
       
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
@@ -1642,6 +1674,9 @@
   var textTemplateAtas = ("<?php echo $atas; ?>").split("|");
   var textTemplateBawah = ("<?php echo $bawah; ?>").split("|");
   console.log(textTemplateAtas, textTemplateBawah);
+  var interval = ("<?php echo $interval_read; ?>");
+  
+  $("#interval").val(interval);
 
   for ($i = 0; $i<textTemplateAtas.length-1; $i++) {
     $('#radioC0Id-'+textTemplateAtas[$i]).prop("disabled", false);
